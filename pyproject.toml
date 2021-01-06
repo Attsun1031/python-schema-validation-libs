@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "python-datavalidation-frameworks"
+version = "0.1.0"
+description = ""
+authors = ["Attsun1031"]
+
+[tool.poetry.dependencies]
+python = "3.9.0"
+Cerberus = "^1.3.2"
+pydantic = "^1.7.3"
+marshmallow = "^3.10.0"
+jsonschema = "^3.2.0"
+attrs = "^20.3.0"
+cattrs = "^1.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
