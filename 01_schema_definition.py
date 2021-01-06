@@ -6,7 +6,6 @@ import typing
 import pydantic as pd
 import marshmallow as ma
 import attr, cattr
-import jsonschema
 import cerberus
 
 
