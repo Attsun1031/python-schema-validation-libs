@@ -104,9 +104,10 @@ class CerberusCustomValidator(cerberus.Validator):
         'UUID': cerberus.TypeDefinition('UUID', (uuid.UUID,), ())
     }
 
-    def _validate_custom(self, custom, field, value):
-        if custom and value == 2:
-            self._error(field, "err")
+
+def cerberus_validate_custom(field, value, error):
+    if value == 2:
+        error(field, "err")
 
 
 cerberus_schema = {
@@ -121,7 +122,7 @@ cerberus_schema = {
     # union
     'u': {'type': ['UUID', 'integer']},
     # custom
-    'c': {'type': 'integer', 'custom': True}
+    'c': {'type': 'integer', 'check_with': cerberus_validate_custom}
 }
 
 pytest_params = [
@@ -167,3 +168,13 @@ class TestValidation:
     @pytest.mark.parametrize(*pytest_params)
     def test_cerberus(self, data, is_valid):
         assert CerberusCustomValidator(cerberus_schema).validate(data) == is_valid
+
+
+class TestCreationWithoutValidation:
+
+    data = dict(i=1, j=[1, 2, 3], k='apple pie', l='abc', u=uuid.uuid4(), c=1)
+
+    def test_pydantic(self):
+        m = PydanticModel.construct(**self.data)
+        try:
+            m.
