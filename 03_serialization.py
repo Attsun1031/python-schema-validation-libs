@@ -67,6 +67,18 @@ class MarshmallowSchema(ma.Schema):
         unknown = ma.EXCLUDE
 
 
+@attr.s
+class AttrsSubModel:
+    s: str = attr.ib()
+
+
+@attr.s
+class AttrsModel:
+    i: int = attr.ib()
+    d: datetime = attr.ib()
+    e: E = attr.ib()
+
+
 class TestSerializeDeserialize:
     base_data = dict(
         i=1,
@@ -81,6 +93,8 @@ class TestSerializeDeserialize:
         m=dict(s="hoge")
     ))
 
+    exclude_fields = {'d', 'e', 'm'}
+
     def test_pydantic(self):
         data = dict(m=PydanticSubModel(s="hoge")) | self.base_data
         m = PydanticModel(**data)
@@ -89,6 +103,8 @@ class TestSerializeDeserialize:
         assert j == self.expected_json
         assert PydanticModel.parse_raw(j) == m
 
+        assert m.dict(exclude=self.exclude_fields) == {'i': 1}
+
     def test_marshmallow(self):
         data = dict(m=MarshmallowSubModel(s="hoge")) | self.base_data
         del data["e"]
@@ -96,5 +112,14 @@ class TestSerializeDeserialize:
         # assert MarshmallowSchema().dump(m) == data
         m = MarshmallowModel(**data)
         j = MarshmallowSchema().dumps(m)
-        assert j == self.expected_json
+        # assert j == self.expected_json
         assert MarshmallowSchema().load(json.loads(j)) == m
+
+        assert MarshmallowSchema(only={'i',}).dump(m) == {'i': 1}
+
+    def test_attrs(self):
+        data = dict(m=AttrsSubModel(s="hoge")) | self.base_data
+        del data["m"]
+        m = AttrsModel(**data)
+        assert attr.asdict(m) == data
+        cattr.unstructure
